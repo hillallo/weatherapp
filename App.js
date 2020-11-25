@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import keys from "./keys";
-import { FlatList, StyleSheet, Text, View, Dimensions, Image } from 'react-native';
+import { FlatList, StyleSheet, Text, View, Dimensions, Image, TextInput, Button } from 'react-native';
 import { Input, Divider } from 'react-native-elements';
+import * as firebase from 'firebase';
+import * as FileSystem from 'expo-file-system';
 
 
 const api = {
@@ -9,6 +11,7 @@ const api = {
 };
 
 function App() {
+
   const dateBuild = (d) => {
     let date = String(new window.Date());
     date = date.slice(3, 15);
@@ -23,39 +26,33 @@ function App() {
   var weathers = [];
   var test = [];
   var placehold;
-  const sunnyimage = './assets/favicon.png';
   var curImage = "";
 
-  const checkFloat = (e) => {
-    var str = e.target.value;
-    console.log(e.target.value)
-    if (!str.match(/^-?[0-9]*[.][0-9]+$/)) {
+
+  const checkFloat = () => {
+    var str1 = query
+    var str2 = query1
+    if (!str1.match(/^-?[0-9]*[.][0-9]+$/) || !str2.match(/^-?[0-9]*[.][0-9]+$/)) {
       alert("Value must be a float number");
       return -1;
     }
-    return e.target.value;
+    return 1;
   }
 
-  const search = (e) => {
-    console.log("HEj")
-    if (e.key === "Enter") {
-      if (checkFloat(e) != -1) {
-        fetch(`${api.base}api/category/pmp3g/version/2/geotype/point/lon/${query}/lat/${query1}/data.json`)
-          .then((res) => res.json())
-          .then((result) => {
-            setTime(result.approvedTime);
-            setWeather(result.timeSeries);
-          }).catch(error => {
-            console.log(error)
-            if (error == "TypeError: Failed to fetch") {
-              alert('Network error, check connection')
-            }
-            if (error == "SyntaxError: Unexpected token R in JSON at position 0") {
-              alert('Out of Bounds, check input values')
-            }
-          });
-      }
+  const search = () => {
+    console.log("check float")
+    if (checkFloat() != -1) {
+      fetch(`${api.base}api/category/pmp3g/version/2/geotype/point/lon/${query}/lat/${query1}/data.json`)
+        .then((res) => res.json())
+        .then((result) => {
+          setTime(result.approvedTime);
+          setWeather(result.timeSeries);
+        }).catch(error => {
+          console.log(error)
+          alert('Error')
+        });
     }
+
   };
 
   return (
@@ -67,27 +64,53 @@ function App() {
           }
         })
       })}
-      <View className="search-container">
-        <Input
+      <View>
+        <TextInput
           type="text"
-          placeholder="Search... click"
+          placeholder="Enter text here..."
           className="search-bar"
-          onChange={(e) => setQuery(e.target.value)}
+          onChangeText={(e) => setQuery(e)}
           value={query}
-          onKeyPress={search}
-        />
+          returnKeyType="done"
+          style={{
+            marginTop: 40,
+          }}
 
-        <Input
+        />
+        <TextInput
           type="text"
           placeholder="longitude"
-          onChange={(e) => setQuery1(e.target.value)}
+          onChangeText={(e) => setQuery1(e)}
           value={query1}
-          onKeyPress={search}
+          returnKeyType="done"
+          style={{
+            marginTop: 40,
+            marginBottom: 20
+          }}
         >
-        </Input>
+        </TextInput>
+        <Button
+          onPress={search}
+          title="Submit"
+          color="#841584"
+        />
+
       </View>
+
+      <Text
+        style={{
+          fontWeight: 'bold'
+        }}>
+        Första: {query}
+      </Text>
+      <Text
+        style={{
+          fontWeight: 'bold'
+        }}>
+        Longitude: {query1}
+      </Text>
       <Text>
-        Första: {query}             Andra: {query1}         approvedTime: {time}
+        approvedTime: {time}
       </Text>
 
       <FlatList
@@ -105,14 +128,15 @@ function App() {
               }}>
               Time: {item.validTime}     Temperature: {item.parameters.map(nameq => {
                 if (nameq.name == "tcc_mean") {
-                  placehold = nameq.values
+                  placehold = nameq.values[nameq.values.length - 1]
+                  console.log(placehold)
                 }
                 if (nameq.name == "t") {
                   return (
                     <Text>
-                      {nameq.values} °C       
+                      {nameq.values} °C
                       <Image
-                        source={require(`./assets/${placehold}.png`)}
+                        //source={require(`./assets/${placehold}.png`)}
                         style={{
                           height: 50,
                           width: 80
@@ -120,14 +144,13 @@ function App() {
                       </Image>
                     </Text>
                   )
-
                 }
-              })} 
+              })}
             </Text>
-            <Divider style={{ 
-              backgroundColor: 'blue' ,
+            <Divider style={{
+              backgroundColor: 'blue',
               marginTop: 10
-          }} />
+            }} />
           </View>
         }>
 
