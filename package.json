@@ -8,7 +8,12 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@react-native-community/netinfo": "^5.9.9",
+    "@react-native-firebase/app": "^10.0.0",
+    "@react-native-firebase/firestore": "^10.0.0",
     "expo": "~39.0.2",
+    "expo-file-system": "~9.2.0",
+    "expo-firestore-offline-persistence": "^0.1.0",
     "expo-status-bar": "~1.0.2",
     "firebase": "7.9.0",
     "react": "16.13.1",
@@ -16,8 +21,7 @@
     "react-native": "https://github.com/expo/react-native/archive/sdk-39.0.4.tar.gz",
     "react-native-elements": "^3.0.0-alpha.1",
     "react-native-fs": "^2.16.6",
-    "react-native-web": "~0.13.12",
-    "expo-file-system": "~9.2.0"
+    "react-native-web": "~0.13.12"
   },
   "devDependencies": {
     "@babel/core": "~7.9.0"
